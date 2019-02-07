@@ -49,7 +49,7 @@ type OrientationChangeEvent = {
   orientationInfo: OrientationInfo;
 };
 
-const _orientationChangeEmitter = new NativeEventEmitter(ExpoScreenOrientation);
+const _orientationChangeEmitter = ExpoScreenOrientation && new NativeEventEmitter(ExpoScreenOrientation);
 let _orientationChangeSubscribers: EmitterSubscription[] = [];
 
 export function allow(orientationLock: OrientationLock): void {
@@ -187,6 +187,10 @@ export function addOrientationChangeListener(
 ): EmitterSubscription {
   if (typeof listener !== 'function') {
     throw new TypeError(`addOrientationChangeListener cannot be called with ${listener}`);
+  }
+
+  if (!_orientationChangeEmitter) {
+    throw new UnavailabilityError('ScreenOrientation', 'addListener');
   }
 
   const eventName = Platform.OS === 'ios' ? 'expoDidUpdateDimensions' : 'didUpdateDimensions';
